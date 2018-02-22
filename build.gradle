@@ -26,6 +26,8 @@ dependencies {
     play "com.typesafe.play:play-logback_$scalaVersion:$playVersion"
     play "com.typesafe.play:filters-helpers_$scalaVersion:$playVersion"
 
+    play "net.logstash.logback:logstash-logback-encoder:4.11"
+
     playTest "org.scalatestplus.play:scalatestplus-play_$scalaVersion:3.1.2"
 }
 
