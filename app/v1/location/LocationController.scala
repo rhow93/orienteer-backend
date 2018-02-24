@@ -14,12 +14,12 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 class LocationController @Inject()(cc: LocationControllerComponents) extends LocationBaseController(cc) {
 
-
-  def getLocation(id: String): Action[AnyContent] = Action({
-    Ok(Json.obj(
-      "name" -> id,
-    ))
-  })
+  def getLocation(id: String): Action[AnyContent] = {
+    Action({ implicit request =>
+      val res: Result = Ok(Json.obj("name" -> id))
+      res
+    })
+  }
 }
 
 

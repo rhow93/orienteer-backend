@@ -8,3 +8,7 @@ GET     /                           controllers.HomeController.index
 
 # Routing to the orienteer API
 ->      /v1/location                 v1.location.LocationRouter
+
+
+# Routing to the user API
+->      /v1/users                    v1.users.UserRouter
