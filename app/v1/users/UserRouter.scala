@@ -9,6 +9,6 @@ import play.api.routing.sird._
 class UserRouter @Inject()(controller: UserController) extends SimpleRouter {
   override def routes: Routes = {
     case POST(p"/") =>
-      controller.addUser()
+      controller.createUser
   }
 }
