@@ -1,18 +1,35 @@
 package v1.users
 
-import scala.concurrent.Future
-
 import javax.inject.Inject
+import play.api.mvc.Result
+
+import scala.concurrent.{ ExecutionContext, Future }
+
 import play.api.Logger
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.mvc._
-import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
+import play.api.mvc.{ AbstractController, Action, ControllerComponents }
+import play.api.libs.functional.syntax._
+import play.api.libs.json._
+
+// Reactive Mongo imports
+import reactivemongo.api.Cursor
+import reactivemongo.api.ReadPreference
+
+import play.modules.reactivemongo.{ // ReactiveMongo Play2 plugin
+  MongoController,
+  ReactiveMongoApi,
+  ReactiveMongoComponents
+}
+
+// BSON-JSON conversions/collection
+import reactivemongo.play.json._
 import play.modules.reactivemongo.json.collection._
 
 class UserController @Inject() (
   components: ControllerComponents,
   val reactiveMongoApi: ReactiveMongoApi
 ) extends AbstractController(components) with MongoController with ReactiveMongoComponents {
+
+  implicit def ec: ExecutionContext = components.executionContext
 
   /*
    * Resolves a JSONCollection
@@ -44,5 +61,17 @@ class UserController @Inject() (
         Created
       }
     }.getOrElse(Future.successful(BadRequest("Invalid JSON")))
+  }
+
+  def findUsersByName(name: String) = Action.async {
+    val cursor: Future[Cursor[JsObject]] = collection.map {
+      _.find(Json.obj("name" -> name))
+        .cursor[JsObject](ReadPreference.primary)
+    }
+
+    val futureUsersList: Future[List[JsObject]] =
+      cursor.flatMap(_.collect[List]())
+
+    futureUsersList.map(Json.arr(_)).map(Ok(_))
   }
 }
