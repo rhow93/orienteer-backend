@@ -7,12 +7,12 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 import play.api.Logger
 import play.api.mvc.{ AbstractController, Action, ControllerComponents }
-import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
 // Reactive Mongo imports
 import reactivemongo.api.Cursor
 import reactivemongo.api.ReadPreference
+import reactivemongo.play.json.collection.JSONCollection
 
 import play.modules.reactivemongo.{ // ReactiveMongo Play2 plugin
   MongoController,
@@ -22,7 +22,6 @@ import play.modules.reactivemongo.{ // ReactiveMongo Play2 plugin
 
 // BSON-JSON conversions/collection
 import reactivemongo.play.json._
-import play.modules.reactivemongo.json.collection._
 
 class UserController @Inject() (
   components: ControllerComponents,
@@ -39,7 +38,7 @@ class UserController @Inject() (
    * The deprecated `.db` function should be replaced as there by `.database`.
    *
    * Note that the `collection` is not a `val`, but a `def`. We do _not_ store
-   * the collection reference to avoid potential problems in development with
+   * the col)lection reference to avoid potential problems in development with
    * Play hot-reloading.
    */
   def collection: Future[JSONCollection] =
@@ -70,7 +69,7 @@ class UserController @Inject() (
     }
 
     val futureUsersList: Future[List[JsObject]] =
-      cursor.flatMap(_.collect[List]())
+      cursor.flatMap(_.collect[List](Int.MaxValue, Cursor.FailOnError[List[JsObject]]()))
 
     futureUsersList.map(Json.arr(_)).map(Ok(_))
   }

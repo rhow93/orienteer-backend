@@ -13,14 +13,14 @@ class LocationRouter @Inject()(controller: LocationController) extends SimpleRou
   val prefix = "/v1/location"
 
   override def routes: Routes = {
-//    case GET(p"/") =>
-//      controller.index
-//
-//    case POST(p"/") =>
-//      controller.process
+    case GET(p"/") =>
+      controller.getAllLocations()
+
+    case POST(p"/") =>
+      controller.createLocation()
 
     case GET(p"/$id") =>
-      controller.getLocation(id)
+      controller.getLocationsByName(id)
   }
 
 }

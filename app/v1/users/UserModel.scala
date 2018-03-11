@@ -7,8 +7,9 @@ import play.api.libs.json._
 case class User(
   name: String,
   age: Int,
-  email: String,
-  password: String, // such safety
+  firebaseId: String,
+  // id: String,
+  // password: String, // such safety
   pointsFound: List[Point],
   locationsStarted: List[Location]
 )
