@@ -1,12 +1,10 @@
 package v1.location
 
 import javax.inject.Inject
-import play.api.mvc.Result
+import play.api.mvc._
 
-import scala.concurrent.{ ExecutionContext, Future }
-
+import scala.concurrent.{ExecutionContext, Future}
 import play.api.Logger
-import play.api.mvc.{ AbstractController, Action, ControllerComponents }
 import play.api.libs.json._
 
 // Reactive Mongo imports
@@ -35,7 +33,7 @@ class LocationController @Inject() (
 
   // apply a body parser to the action, which means that
   // request.body is now a JsValue
-  def createLocation = Action.async(parse.json) { implicit request =>
+  def createLocation: Action[JsValue] = Action.async(parse.json) { implicit request =>
     request.body.validate[Location].map { Location =>
       collection.flatMap(_.insert(Location)).map { lastError =>
         Logger.debug(s"Successfully inserted with LastError: $lastError")
@@ -44,7 +42,7 @@ class LocationController @Inject() (
     }.getOrElse(Future.successful(BadRequest("Invalid JSON")))
   }
 
-  def getAllLocations() = Action.async {
+  def getAllLocations: Action[AnyContent] = Action.async {
     val futureLocationsList: Future[List[JsObject]] = collection.flatMap {
       _.find(Json.obj()).cursor[JsObject](ReadPreference.primary).
         collect[List](100, Cursor.FailOnError[List[JsObject]]())
@@ -52,7 +50,7 @@ class LocationController @Inject() (
 
     futureLocationsList.map(Json.arr(_)).map(Ok(_))
   }
-  def getLocationsByName(name: String) = Action.async {
+  def getLocationsByName(name: String): Action[AnyContent] = Action.async {
     val futureLocationsList: Future[Option[Location]] = collection.flatMap {
       _.find(Json.obj("name" -> name)).one[Location]
     }
