@@ -53,10 +53,8 @@ class LocationController @Inject() (
     futureLocationsList.map(Json.arr(_)).map(Ok(_))
   }
   def getLocationsByName(name: String) = Action.async {
-    val futureLocationsList: Future[List[JsObject]] = collection.flatMap {
-      _.find(Json.obj("name" -> name))
-        .cursor[JsObject](ReadPreference.primary)
-        .collect[List](100, Cursor.FailOnError[List[JsObject]]())
+    val futureLocationsList: Future[Option[Location]] = collection.flatMap {
+      _.find(Json.obj("name" -> name)).one[Location]
     }
 
     futureLocationsList.map(Json.arr(_)).map(Ok(_))
